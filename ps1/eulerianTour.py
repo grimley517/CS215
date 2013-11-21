@@ -9,33 +9,47 @@
 # [(1, 2), (2, 3), (3, 1)]
 # A possible Eulerian tour would be [1, 2, 3, 1]
 import random
+
 def find_eulerian_tour(graph):
     # your code here
-    nodes = []
-    for tup in graph:
-        for part in tup:
-            if part not in nodes:
-                nodes.append(part)
-    tour = rectour([],nodes, graph)
-    return []
+    nodes = graph.keys()
+    tour = nodes[:]
+    print (tour)
+    while testTour(graph,tour) != 0:
+        tour = nodes[:]
+        random.shuffle(tour)
+        print (tour)
+        tour.append(tour[0])
+    return tour
 
-def rectour(tour, nodes,graph):
-    if len(nodes == 1) and (len(graph) == 1) and (tour[-1] == graph[0][0]) and (tour[0] == graph[0][-1]):
-        tour.append(graph[0][-1])
-        return tour
-    else:
-        options = []
-        for tup in graph:
-            options.append(tup[0])
-        nnext = random.choice(options)
-        tour.append(nnext)
-        nodes.remove(nnext)
-        routeOpts = []
-        for tup in graph:
-            if tup[0] == nnext:
-                routeOpts.append(tup)
-        route = random.choice(routeOpts)
-        graph.remove(route)
-        return (rectour(tour, nodes, graph))
-    
-print (find_eulerian_tour([(1, 2), (2, 3), (3, 1)])
+def testTour(graph, tour):
+    if not len(graph.keys()) == len(tour)-1:
+        return 1
+    if not tour[0] == tour[-1]:
+        return 2
+    for i in range(len(tour)):
+        if i < len(tour)-1:
+            if tour[i+1] not in graph[tour[i]]:
+                return 3
+    return 0
+
+def makeGraph(linkTupleList):
+    graph = {}
+    for link in linkTupleList:
+        for node in link:
+            if node not in graph.keys():
+                graph[node] = []
+    for link in linkTupleList:
+        graph = addLink(graph, link)
+    return graph
+        
+def addLink (graph, link):
+    graph[link[0]].append(link[1])
+    graph[link[1]].append(link[0])
+    return graph
+
+#G1 = [(1,2), (2,3),(3,4),(2,4),(4,1)]
+#print (makeGraph(G1))
+#print (testTour(makeGraph(G1),[1,2,3,1]))#should be disconnected, and too short
+#print (testTour(makeGraph(G1),[1,2,3,4,1]))
+#print (find_eulerian_tour(makeGraph(G1)))
